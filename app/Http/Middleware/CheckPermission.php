@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Middleware\CheckLogin as Middleware;
+use App\Http\Middleware\EncryptCookies as Middleware;
 use App\Http\Service\AuthService;
 use App\Models\UserRole;
 use Closure;
@@ -38,7 +38,7 @@ class CheckPermission extends Middleware
                 'data' => null,
             ]);
         } else {
-            if ($userInfo['expire'] > time()) {
+            if ($userInfo['expire'] < time()) {
                 return response()->json([
                     'code' => 10021,
                     'msg' => '未登录',
