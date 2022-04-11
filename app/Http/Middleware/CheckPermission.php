@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class CheckPermission extends Middleware
 {
     /**
-     * 超管和普通管理员
+     * super admin and admin group
      *
      * @var string[]
      */
@@ -21,6 +21,8 @@ class CheckPermission extends Middleware
     ];
 
     /**
+     * not log in or do not have permission will return error.
+     *
      * @param \Illuminate\Http\Request $request
      * @param \Closure $next
      * @return mixed
