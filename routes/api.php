@@ -20,9 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //登录
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
 
-Route::middleware(['checkPermission'])->group(function () {
+Route::middleware(['checkLogin'])->group(function () {
     //帖子
     Route::get('post', [PostController::class, 'index'])->name('post.index');
     Route::post('post', [PostController::class, 'store'])->name('post.store');

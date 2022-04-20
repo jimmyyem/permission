@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //定义一个权限，用到的地方判断下 allows 即可
+        // 用户要求是超级管理员或者普通管理员
+        Gate::define('user', function ($user) {
+            return $user->isSuperAdmin() || $user->isAdmin();
+        });
+
+        // 本人或者普通管理员可编辑帖子
+        Gate::define('post', function ($user, $post) {
+            return $user->id == $post->user_id || $user->isAdmin();
+        });
     }
 }

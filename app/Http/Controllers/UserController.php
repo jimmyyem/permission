@@ -5,12 +5,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BusiException;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->checkPermission();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -82,5 +89,12 @@ class UserController extends Controller
         $user->delete();
 
         return $this->json();
+    }
+
+    protected function checkPermission()
+    {
+        if (! Gate::allows('edit-post', $post)) {
+            throw new BusiException('无权限访问', 10043);
+        }
     }
 }

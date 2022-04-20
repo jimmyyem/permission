@@ -7,8 +7,9 @@ use App\Http\Service\AuthService;
 use App\Models\UserRole;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class CheckPermission extends Middleware
+class CheckLogin extends Middleware
 {
     /**
      * super admin and admin group
@@ -29,9 +30,6 @@ class CheckPermission extends Middleware
      */
     public function handle(Request $request, Closure $next)
     {
-        [$group,] = explode('.', $request->route()->getName());
-
-        // check login
         $userInfo = app(AuthService::class)->getAuthInfo();
         if (is_null($userInfo)) {
             return response()->json([
@@ -48,6 +46,15 @@ class CheckPermission extends Middleware
                 ]);
             }
         }
+        Auth::loginUsingId($userInfo['user_id']);
+
+        return $next($request);
+
+        /**
+         * 以下代码暂时注释掉，使用Gate实现，不使用diy的方式，不容易扩展权限
+         */
+
+        [$group,] = explode('.', $request->route()->getName());
 
         // check permission
         $userRole = UserRole::query()->where('user_id', $userInfo['user_id'])->join('roles', 'roles.id', '=', 'user_role.role_id')->first();
@@ -75,7 +82,5 @@ class CheckPermission extends Middleware
                 }
                 break;
         }
-
-        return $next($request);
     }
 }

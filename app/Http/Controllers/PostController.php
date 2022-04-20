@@ -5,9 +5,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BusiException;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -61,6 +63,8 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        $this->checkPermission();
+
         $data = $request->all();
         if (! empty($data)) {
             $data['user_id'] && $post->user_id = $data['user_id'];
@@ -80,8 +84,17 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $this->checkPermission();
+
         $post->delete();
 
         return $this->json();
+    }
+
+    protected function checkPermission()
+    {
+        if (! Gate::allows('edit-post', $post)) {
+            throw new BusiException('无权限访问', 10043);
+        }
     }
 }
