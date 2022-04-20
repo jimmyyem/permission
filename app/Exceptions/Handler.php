@@ -2,7 +2,6 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +51,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if (request()->ajax()) {
+        if (request()->ajax() || $request->expectsJson() || $request->wantsJson()) {
             if ($exception instanceof ValidationException) {
                 Log::error("数据校验异常:".$exception->getMessage());
 
@@ -81,6 +80,7 @@ class Handler extends ExceptionHandler
 
             // Exception and BusiException
             Log::error($exception->getMessage());
+
             return response()->json([
                 'code' => $exception->getCode(),
                 'msg' => $exception->getMessage(),
